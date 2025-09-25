@@ -15,9 +15,9 @@ def clean_parquet_files():
     #Eliminate duplicate entries and entries with null variables
     try:  
         con.execute(f"""CREATE TABLE clean_yellow_tripdata AS SELECT DISTINCT * FROM yellow_tripdata;
-                    "DROP TABLE yellow_tripdata;
+                    DROP TABLE yellow_tripdata;
                     ALTER TABLE clean_yellow_tripdata RENAME TO yellow_tripdata;""")
-        con.execute(f"""DELETE FROM yellow_tripdata WHERE VendorID IS NULL
+        con.execute(f"""DELETE FROM yellow_tripdata WHERE
                     OR tpep_pickup_datetime IS NULL
                     OR tpep_dropoff_datetime IS NULL
                     OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
@@ -31,7 +31,7 @@ def clean_parquet_files():
         con.execute(f"""CREATE TABLE clean_green_tripdata AS SELECT DISTINCT * FROM green_tripdata;
                     DROP TABLE green_tripdata;
                     ALTER TABLE clean_green_tripdata RENAME TO green_tripdata;""")
-        con.execute(f"""DELETE FROM green_tripdata WHERE VendorID IS NULL
+        con.execute(f"""DELETE FROM green_tripdata WHERE
                     OR lpep_pickup_datetime IS NULL
                     OR lpep_dropoff_datetime IS NULL
                     OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
@@ -55,8 +55,7 @@ def clean_test():
     logger.info("Connected to emissions.duckdb for clean testing")
     try:
         #test to see if there are any remaining entries that break the conditions in yellow_tripdata
-        print(con.execute("""SELECT COUNT(*) FROM yellow_tripdata WHERE VendorID IS NULL
-                                 OR tpep_pickup_datetime IS NULL OR tpep_dropoff_datetime IS NULL 
+        print(con.execute("""SELECT COUNT(*) FROM yellow_tripdata WHERE tpep_pickup_datetime IS NULL OR tpep_dropoff_datetime IS NULL 
                                  OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
                                  OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0])
@@ -67,8 +66,7 @@ def clean_test():
             logging.error("Duplicates found")
         
         #test to see if there are any remaining entries that break the conditions in green_tripdata   
-        print(con.execute("""SELECT COUNT(*) FROM green_tripdata WHERE VendorID IS NULL
-                                 OR lpep_pickup_datetime IS NULL OR lpep_dropoff_datetime IS NULL 
+        print(con.execute("""SELECT COUNT(*) FROM green_tripdata WHERE OR lpep_pickup_datetime IS NULL OR lpep_dropoff_datetime IS NULL 
                                  OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
                                  OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0]) 
