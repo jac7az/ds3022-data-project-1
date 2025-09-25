@@ -19,14 +19,14 @@ def load_parquet_files():
         logger.info("Connected to DuckDB instance")
         
         #Initialize the table using Jan2014 data. Will remove duplicates in cleaning.
-        con.execute(f"""CREATE OR REPLACE TABLE yellow_tripdata AS SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2014-01.parquet');""")
-        con.execute(f"""CREATE OR REPLACE TABLE green_tripdata AS SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2014-01.parquet');""")
+        con.execute("""CREATE OR REPLACE TABLE yellow_tripdata (tpep_pickup_datetime TIMESTAMP, tpep_dropoff_datetime TIMESTAMP,passenger_count BIGINT, trip_distance DOUBLE);""")
+        con.execute("""CREATE OR REPLACE TABLE green_tripdata (lpep_pickup_datetime TIMESTAMP, lpep_dropoff_datetime TIMESTAMP,passenger_count BIGINT, trip_distance DOUBLE);""")
         logger.info("Created green and yellow tables")
          #Get a list of all 10-years worth of files for yellow taxi trips and green taxi trips and put them into lists so sql insert into table.
         for year in range(2014,2025):
             for month in range(1,13):
-                con.execute(f"""INSERT INTO yellow_tripdata SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{year}-{month:02}.parquet');
-                            INSERT INTO green_tripdata SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_{year}-{month:02}.parquet');""")
+                con.execute(f"""INSERT INTO yellow_tripdata SELECT tpep_pickup_datetime, tpep_dropoff_datetime,passenger_count, trip_distance FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{year}-{month:02}.parquet');
+                            INSERT INTO green_tripdata SELECT lpep_pickup_datetime, lpep_dropoff_datetime,passenger_count, trip_distance FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_{year}-{month:02}.parquet');""")
         logger.info("Successfully added 10 years of files into each table")
 
         #Create separate table for emissions
