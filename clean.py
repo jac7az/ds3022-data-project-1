@@ -18,9 +18,10 @@ def clean_parquet_files():
                     DROP TABLE yellow_tripdata;
                     ALTER TABLE clean_yellow_tripdata RENAME TO yellow_tripdata;""")
         con.execute(f"""DELETE FROM yellow_tripdata WHERE
-                    OR tpep_pickup_datetime IS NULL
+                    tpep_pickup_datetime IS NULL
                     OR tpep_dropoff_datetime IS NULL
                     OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
+                    OR tpep_dropoff_datetime = tpep_pickup_datetime
                     OR passenger_count IS NULL
                     OR passenger_count=0
                     OR trip_distance IS NULL
@@ -32,9 +33,10 @@ def clean_parquet_files():
                     DROP TABLE green_tripdata;
                     ALTER TABLE clean_green_tripdata RENAME TO green_tripdata;""")
         con.execute(f"""DELETE FROM green_tripdata WHERE
-                    OR lpep_pickup_datetime IS NULL
+                    lpep_pickup_datetime IS NULL
                     OR lpep_dropoff_datetime IS NULL
                     OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
+                    OR lpep_dropoff_datetime = lpep_pickup_datetime
                     OR passenger_count IS NULL
                     OR passenger_count=0
                     OR trip_distance IS NULL
