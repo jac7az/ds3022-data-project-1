@@ -55,28 +55,31 @@ def clean_test():
     logger.info("Connected to emissions.duckdb for clean testing")
     try:
         #test to see if there are any remaining entries that break the conditions in yellow_tripdata
-        print(con.execute(f"""SELECT COUNT(*) FROM yellow_tripdata WHERE VendorID IS NULL
+        print(con.execute("""SELECT COUNT(*) FROM yellow_tripdata WHERE VendorID IS NULL
                                  OR tpep_pickup_datetime IS NULL OR tpep_dropoff_datetime IS NULL 
                                  OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
                                  OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0])
-        if con.execute("SELECT COUNT(*) FROM yellow_tripdata;").fetchone()[0]-con.execute("SELECT COUNT(DISTINCT *) FROM yellow_tripdata;").fetchone()[0]==0:
+        if con.execute("""SELECT COUNT(*) FROM yellow_tripdata;""").fetchone()[0]-con.execute("""SELECT COUNT(DISTINCT *) FROM yellow_tripdata;""").fetchone()[0]==0:
             print("No duplicates found.")
             logging.info("No duplicate or incorrect entries in yellow_tripdata")
         else:
             logging.error("Duplicates found")
         
         #test to see if there are any remaining entries that break the conditions in green_tripdata   
-        print(con.execute(f"""SELECT COUNT(*) FROM green_tripdata WHERE VendorID IS NULL
+        print(con.execute("""SELECT COUNT(*) FROM green_tripdata WHERE VendorID IS NULL
                                  OR lpep_pickup_datetime IS NULL OR lpep_dropoff_datetime IS NULL 
                                  OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
                                  OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0]) 
-        if con.execute("SELECT COUNT(*) FROM green_tripdata;").fetchone()[0]-con.execute("SELECT COUNT(DISTINCT *) FROM green_tripdata;").fetchone()[0]==0:
+        
+        total=con.execute("""SELECT COUNT(*) FROM green_tripdata;""").fetchall()
+        unique=con.execute("""SELECT COUNT(DISTINCT *) FROM green_tripdata;""").fetchall()
+        if total-unique==0:
             print("No duplicates found.")
             logging.info("No duplicate or incorrect entries in green_tripdata")
         else:
-            logging.error("Duplicates found")
+            logging.error("Duplicates found")        
     except Exception as e:
         print(f"Clean testing error has occured:{e}")
 

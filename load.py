@@ -19,8 +19,8 @@ def load_parquet_files():
         logger.info("Connected to DuckDB instance")
         
         #Initialize the table using Jan2014 data. Will remove duplicates in cleaning.
-        con.execute(f"""CREATE OR REPLACE TABLE IF NOT EXISTS yellow_tripdata AS SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2014-01.parquet');""")
-        con.execute(f"""CREATE OR REPLACE TABLE IF NOT EXISTS green_tripdata AS SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2014-01.parquet');""")
+        con.execute(f"""CREATE OR REPLACE TABLE yellow_tripdata AS SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2014-01.parquet');""")
+        con.execute(f"""CREATE OR REPLACE TABLE green_tripdata AS SELECT * FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2014-01.parquet');""")
         logger.info("Created green and yellow tables")
          #Get a list of all 10-years worth of files for yellow taxi trips and green taxi trips and put them into lists so sql insert into table.
         for year in range(2014,2025):
@@ -30,7 +30,7 @@ def load_parquet_files():
         logger.info("Successfully added 10 years of files into each table")
 
         #Create separate table for emissions
-        con.execute(f"""CREATE TABLE IF NOT EXISTS emissions AS SELECT * FROM read_csv('data/vehicle_emissions.csv')""")
+        con.execute(f"""CREATE OR REPLACE TABLE emissions AS SELECT * FROM read_csv('data/vehicle_emissions.csv')""")
         logger.info("created emissions table")
 
         #Output basic descriptive stats to screen and to log.
