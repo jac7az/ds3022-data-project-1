@@ -1,9 +1,12 @@
-CREATE OR REPLACE TABLE yellow_tripdata_co2 AS
-SELECT y.*,
-ROUND((y.trip_distance*e.co2_grams_per_mile)/1000,3) AS trip_co2_kgs,
-ROUND(y.trip_distance/(EXTRACT(EPOCH FROM (y.tpep_dropoff_datetime - y.tpep_pickup_datetime)) / 3600),3) AS avg_mph,
+ALTER TABLE yellow_tripdata ADD COLUMN IF NOT EXISTS trip_co2_kgs DECIMAL(10,3);
+ALTER TABLE yellow_tripdata ADD COLUMN IF NOT EXISTS avg_mph DECIMAL(10,3);
+ALTER TABLE yellow_tripdata ADD COLUMN IF NOT EXISTS hour_of_day INT;
+ALTER TABLE yellow_tripdata ADD COLUMN IF NOT EXISTS day_of_week CHAR(12);
+ALTER TABLE yellow_tripdata ADD COLUMN IF NOT EXISTS week_of_year INT;
+ALTER TABLE yellow_tripdata ADD COLUMN IF NOT EXISTS month_of_year CHAR(12);
 
-FROM yellow_tripdata AS y
-JOIN emissions AS e
-ON e.vehicle_type='yellow_taxi'
-
+UPDATE yellow_tripdata AS y
+SET trip_co2_kgs = (y.trip_distance*e.co2_grams_per_mile)/1000,
+avg_mph = y.trip_distance/(DATE_DIFF('second',tpep_pickup_datetime, tpep_dropoff_datetime)/3600)
+FROM emissions AS e
+WHERE e.vehicle_type='yellow_taxi'
