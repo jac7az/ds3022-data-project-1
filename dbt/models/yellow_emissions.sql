@@ -14,4 +14,5 @@ SELECT
     DAYNAME(y.tpep_pickup_datetime) AS day_of_week,
     WEEKOFYEAR(y.tpep_pickup_datetime) AS week_of_year,
     MONTHNAME(y.tpep_pickup_datetime) AS month_of_year
-FROM {{ source('nyc_taxi_data', 'yellow_tripdata') }} AS y
+FROM {{source('nyc_taxi_data', 'yellow_tripdata')}} AS y
+JOIN {{source('nyc_taxi_data', 'EMISSIONS')}} AS e ON e.vehicle_type='yellow_taxi'
