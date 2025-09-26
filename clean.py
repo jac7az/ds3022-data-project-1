@@ -17,7 +17,7 @@ def clean_parquet_files():
         con.execute(f"""CREATE TABLE clean_yellow_tripdata AS SELECT DISTINCT * FROM yellow_tripdata;
                     DROP TABLE yellow_tripdata;
                     ALTER TABLE clean_yellow_tripdata RENAME TO yellow_tripdata;""")
-        con.execute(f"""DELETE FROM yellow_tripdata WHERE
+        con.execute("""DELETE FROM yellow_tripdata WHERE
                     tpep_pickup_datetime IS NULL
                     OR tpep_dropoff_datetime IS NULL
                     OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
