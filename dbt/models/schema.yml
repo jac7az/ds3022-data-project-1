@@ -6,6 +6,3 @@ sources:
       - name: yellow_tripdata
       - name: green_tripdata
       - name: emissions
-models:
-  - green_emissions
-  - yellow_emissions

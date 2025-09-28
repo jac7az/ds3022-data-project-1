@@ -1,3 +1,5 @@
+{{config(materialized='table')}} 
+
 SELECT 
     y.tpep_pickup_datetime, 
     y.tpep_dropoff_datetime,
