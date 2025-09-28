@@ -1,8 +1,8 @@
-version: 2
+version: 1.0
 sources:
-  - name: nyc_taxi_data   
+  - name: emissions   
     schema: main
     tables:
       - name: yellow_tripdata
       - name: green_tripdata
-      - name: emissions
+      - name: nyc_taxi_data

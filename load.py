@@ -33,7 +33,7 @@ def load_parquet_files():
         logger.info("Successfully added 10 years of files into each table")
 
         #Create separate table for emissions
-        con.execute(f"""CREATE OR REPLACE TABLE emissions AS SELECT * FROM read_csv('data/vehicle_emissions.csv')""")
+        con.execute(f"""CREATE OR REPLACE TABLE nyc_taxi_data AS SELECT * FROM read_csv('data/vehicle_emissions.csv')""")
         logger.info("created emissions table")
 
         #Output basic descriptive stats to screen and to log.
