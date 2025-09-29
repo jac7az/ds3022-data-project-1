@@ -10,8 +10,3 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-
-models:
-  nyc_taxi_emissions:
-    staging:
-      +materialized: table

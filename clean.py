@@ -42,10 +42,6 @@ def clean_parquet_files():
                     """)
         logging.info("Created clean version of green tripdata")
 
-        con.execute(f"""CREATE TABLE clean_emissions AS SELECT DISTINCT * FROM emissions;
-                    DROP TABLE emissions;
-                    ALTER TABLE clean_emissions RENAME TO emissions;""")
-        logging.info("Create clean table for emissions")
     except Exception as e:
         print(f"An error occurred: {e}")
         logger.error(f"An error occurred: {e}")
@@ -59,20 +55,22 @@ def clean_test():
                                  OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
                                  OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0])
-        if con.execute("""SELECT COUNT(*) FROM yellow_tripdata;""").fetchone()[0]-con.execute("""SELECT COUNT(DISTINCT *) FROM yellow_tripdata;""").fetchone()[0]==0:
+        y_total=con.execute("""SELECT COUNT(*) FROM yellow_tripdata;""").fetchone()[0]
+        y_distinct=con.execute("""SELECT COUNT(*) FROM (SELECT DISTINCT * FROM yellow_tripdata);""").fetchone()[0]
+        if y_total-y_distinct==0:
             print("No duplicates found.")
             logging.info("No duplicate or incorrect entries in yellow_tripdata")
         else:
             logging.error("Duplicates found")
         
         #test to see if there are any remaining entries that break the conditions in green_tripdata   
-        print(con.execute("""SELECT COUNT(*) FROM green_tripdata WHERE OR lpep_pickup_datetime IS NULL OR lpep_dropoff_datetime IS NULL 
+        print(con.execute("""SELECT COUNT(*) FROM green_tripdata WHERE lpep_pickup_datetime IS NULL OR lpep_dropoff_datetime IS NULL 
                                  OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
                                  OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0]) 
         
-        total=con.execute("""SELECT COUNT(*) FROM green_tripdata;""").fetchall()
-        unique=con.execute("""SELECT COUNT(DISTINCT *) FROM green_tripdata;""").fetchall()
+        total=con.execute("""SELECT COUNT(*) FROM green_tripdata;""").fetchone()[0]
+        unique=con.execute("""SELECT COUNT(*) FROM (SELECT DISTINCT * FROM green_tripdata);""").fetchone()[0]
         if total-unique==0:
             print("No duplicates found.")
             logging.info("No duplicate or incorrect entries in green_tripdata")

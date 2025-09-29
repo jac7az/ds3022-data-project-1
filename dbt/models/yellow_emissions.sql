@@ -1,3 +1,4 @@
+--Creating new table with transformed data for yellow taxis
 {{config(materialized='table')}} 
 
 SELECT 
