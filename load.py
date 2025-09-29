@@ -25,7 +25,7 @@ def load_parquet_files():
         logger.info("Created green and yellow tables")
 
          #Get a list of all 10-years worth of files for yellow taxi trips and green taxi trips and put them into lists so sql insert into table.
-        for year in range(2023,2025):
+        for year in range(2014,2025):
             for month in range(1,13):
                 con.execute(f"""INSERT INTO yellow_tripdata SELECT tpep_pickup_datetime, tpep_dropoff_datetime,passenger_count, trip_distance FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{year}-{month:02}.parquet')
                             WHERE YEAR(tpep_pickup_datetime)={year};

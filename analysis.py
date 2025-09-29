@@ -133,10 +133,11 @@ def analysis():
         plt.plot(green_df['year'],green_df['co2'],label="Green Taxi")
         plt.legend()
         plt.xlabel("Year")
+        plt.xticks(yellow_df['year'])
         plt.ylabel("Total CO2 Emission in KG")
         plt.savefig('yearly_emissions.png')
 
-        logging.info("PNG created. Search working directory.")
+        logging.info("PNG created. Check workspace sidebar.")
 
     except Exception as e:
         print(f"An error occurred: {e}")

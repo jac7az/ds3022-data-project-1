@@ -1,5 +1,4 @@
 duckdb
 pandas
 dbt-duckdb
-seaborn
 matplotlib
