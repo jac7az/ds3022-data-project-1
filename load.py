@@ -32,11 +32,11 @@ def load_parquet_files():
                             INSERT INTO green_tripdata SELECT lpep_pickup_datetime, lpep_dropoff_datetime,passenger_count, trip_distance FROM read_parquet('https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_{year}-{month:02}.parquet')
                             WHERE YEAR(lpep_pickup_datetime)={year};""")
                 time.sleep(60)
-        logger.info("Successfully added 10 years of files into each table")
+        logging.info("Successfully added 10 years of files into each table")
 
         #Create separate table for emissions
         con.execute(f"""CREATE OR REPLACE TABLE nyc_taxi_data AS SELECT * FROM read_csv('data/vehicle_emissions.csv')""")
-        logger.info("created nyc_taxi_data table")
+        logging.info("created nyc_taxi_data table")
 
         #Output basic descriptive stats to screen and to log.
         columns=['column_name','column_type','null','key','default','extra']
