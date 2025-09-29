@@ -3,7 +3,7 @@ import logging
 
 logging.basicConfig(
     level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-    filename='load.log'
+    filename='clean.log'
 )
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ def clean_parquet_files():
                     tpep_pickup_datetime IS NULL
                     OR tpep_dropoff_datetime IS NULL
                     OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
+                    OR YEAR(tpep_pickup_datetime) NOT BETWEEN 2014 AND 2024
                     OR passenger_count IS NULL
                     OR passenger_count=0
                     OR trip_distance IS NULL
@@ -36,6 +37,7 @@ def clean_parquet_files():
                     OR lpep_dropoff_datetime IS NULL
                     OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
                     OR passenger_count IS NULL
+                    OR YEAR(lpep_pickup_datetime) NOT BETWEEN 2014 AND 2024
                     OR passenger_count=0
                     OR trip_distance IS NULL
                     OR trip_distance>100;
@@ -51,28 +53,28 @@ def clean_test():
     logger.info("Connected to emissions.duckdb for clean testing")
     try:
         #test to see if there are any remaining entries that break the conditions in yellow_tripdata
-        print(con.execute("""SELECT COUNT(*) FROM yellow_tripdata WHERE tpep_pickup_datetime IS NULL OR tpep_dropoff_datetime IS NULL 
+        con.execute("""SELECT COUNT(*) FROM yellow_tripdata WHERE tpep_pickup_datetime IS NULL OR tpep_dropoff_datetime IS NULL 
                                  OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
-                                 OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0])
+                                 OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0]
         y_total=con.execute("""SELECT COUNT(*) FROM yellow_tripdata;""").fetchone()[0]
         y_distinct=con.execute("""SELECT COUNT(*) FROM (SELECT DISTINCT * FROM yellow_tripdata);""").fetchone()[0]
         if y_total-y_distinct==0:
-            print("No duplicates found.")
+            print("No duplicate or incorrect entries in yellow_tripdata.")
             logging.info("No duplicate or incorrect entries in yellow_tripdata")
         else:
             logging.error("Duplicates found")
         
         #test to see if there are any remaining entries that break the conditions in green_tripdata   
-        print(con.execute("""SELECT COUNT(*) FROM green_tripdata WHERE lpep_pickup_datetime IS NULL OR lpep_dropoff_datetime IS NULL 
+        con.execute("""SELECT COUNT(*) FROM green_tripdata WHERE lpep_pickup_datetime IS NULL OR lpep_dropoff_datetime IS NULL 
                                  OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
                                  OR passenger_count IS NULL OR passenger_count=0
-                                 OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0]) 
+                                 OR trip_distance IS NULL OR trip_distance>100;""").fetchone()[0] 
         
         total=con.execute("""SELECT COUNT(*) FROM green_tripdata;""").fetchone()[0]
         unique=con.execute("""SELECT COUNT(*) FROM (SELECT DISTINCT * FROM green_tripdata);""").fetchone()[0]
         if total-unique==0:
-            print("No duplicates found.")
+            print("No duplicate or incorrect entries in green_tripdata.")
             logging.info("No duplicate or incorrect entries in green_tripdata")
         else:
             logging.error("Duplicates found")        
