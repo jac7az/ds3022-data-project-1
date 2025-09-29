@@ -1,4 +1,4 @@
---Creating new table with transformed data for green taxis
+--Creating new table with transformed data from README.md for green taxis 
 {{config(materialized='table')}}
 
 SELECT 

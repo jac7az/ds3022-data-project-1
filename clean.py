@@ -12,7 +12,7 @@ def clean_parquet_files():
     con = duckdb.connect(database='emissions.duckdb', read_only=False)
     logger.info("Connected to emissions.duckdb for cleaning")
 
-    #Eliminate duplicate entries and entries with null variables
+    #Eliminate duplicate entries, entries with null variables, and entries not fulfilling conditions from README.md for yellow and green tables
     try:  
         con.execute(f"""CREATE TABLE clean_yellow_tripdata AS SELECT DISTINCT * FROM yellow_tripdata;
                     DROP TABLE yellow_tripdata;
@@ -21,7 +21,6 @@ def clean_parquet_files():
                     tpep_pickup_datetime IS NULL
                     OR tpep_dropoff_datetime IS NULL
                     OR tpep_dropoff_datetime - tpep_pickup_datetime > INTERVAL '24 hours'
-                    OR YEAR(tpep_pickup_datetime) NOT BETWEEN 2014 AND 2024
                     OR passenger_count IS NULL
                     OR passenger_count=0
                     OR trip_distance IS NULL
@@ -37,7 +36,6 @@ def clean_parquet_files():
                     OR lpep_dropoff_datetime IS NULL
                     OR lpep_dropoff_datetime - lpep_pickup_datetime > INTERVAL '24 hours'
                     OR passenger_count IS NULL
-                    OR YEAR(lpep_pickup_datetime) NOT BETWEEN 2014 AND 2024
                     OR passenger_count=0
                     OR trip_distance IS NULL
                     OR trip_distance>100;
@@ -48,7 +46,7 @@ def clean_parquet_files():
         print(f"An error occurred: {e}")
         logger.error(f"An error occurred: {e}")
 
-def clean_test():
+def clean_test(): #Test function
     con = duckdb.connect(database='emissions.duckdb', read_only=False)
     logger.info("Connected to emissions.duckdb for clean testing")
     try:
